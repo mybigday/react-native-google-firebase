@@ -1,0 +1,11 @@
+{
+  "name": "react-native-google-firebase",
+  "version": "0.0.1",
+  "description": "Firebase 3 (google version) native framework wrap.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pepper Yen <pepper.yen@gmail.com>",
+  "license": "MIT"
+}

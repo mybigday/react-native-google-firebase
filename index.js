@@ -1,0 +1,1 @@
+console.log("In to react native google firebase");
