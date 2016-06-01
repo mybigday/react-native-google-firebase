@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		561A61AD1CFF1B45001F0F9D /* FirebaseAuth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 561A61AB1CFF1B45001F0F9D /* FirebaseAuth.framework */; };
+		561A61AE1CFF1B45001F0F9D /* GoogleNetworkingUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 561A61AC1CFF1B45001F0F9D /* GoogleNetworkingUtilities.framework */; };
 		5672D4911CFDC6D3000D61B6 /* RNGoogleFirebase.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5672D4901CFDC6D3000D61B6 /* RNGoogleFirebase.h */; };
 		5672D4931CFDC6D3000D61B6 /* RNGoogleFirebase.m in Sources */ = {isa = PBXBuildFile; fileRef = 5672D4921CFDC6D3000D61B6 /* RNGoogleFirebase.m */; };
 		5672D4FB1CFDDFF3000D61B6 /* FirebaseAnalytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5672D4F61CFDDFF3000D61B6 /* FirebaseAnalytics.framework */; };
@@ -31,6 +33,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		561A61AB1CFF1B45001F0F9D /* FirebaseAuth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAuth.framework; sourceTree = "<group>"; };
+		561A61AC1CFF1B45001F0F9D /* GoogleNetworkingUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleNetworkingUtilities.framework; sourceTree = "<group>"; };
 		5672D48D1CFDC6D3000D61B6 /* libRNGoogleFirebase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNGoogleFirebase.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5672D4901CFDC6D3000D61B6 /* RNGoogleFirebase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNGoogleFirebase.h; sourceTree = "<group>"; };
 		5672D4921CFDC6D3000D61B6 /* RNGoogleFirebase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNGoogleFirebase.m; sourceTree = "<group>"; };
@@ -48,7 +52,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				561A61AE1CFF1B45001F0F9D /* GoogleNetworkingUtilities.framework in Frameworks */,
 				5672D5011CFDDFFC000D61B6 /* FirebaseDatabase.framework in Frameworks */,
+				561A61AD1CFF1B45001F0F9D /* FirebaseAuth.framework in Frameworks */,
 				5672D4FD1CFDDFF3000D61B6 /* GoogleInterchangeUtilities.framework in Frameworks */,
 				5672D4FB1CFDDFF3000D61B6 /* FirebaseAnalytics.framework in Frameworks */,
 				5672D4FE1CFDDFF3000D61B6 /* GoogleSymbolUtilities.framework in Frameworks */,
@@ -60,6 +66,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		561A61C31CFF1B55001F0F9D /* Firebase */ = {
+			isa = PBXGroup;
+			children = (
+				561A61AB1CFF1B45001F0F9D /* FirebaseAuth.framework */,
+				561A61AC1CFF1B45001F0F9D /* GoogleNetworkingUtilities.framework */,
+				5672D5001CFDDFFC000D61B6 /* FirebaseDatabase.framework */,
+				5672D4F61CFDDFF3000D61B6 /* FirebaseAnalytics.framework */,
+				5672D4F71CFDDFF3000D61B6 /* FirebaseInstanceID.framework */,
+				5672D4F81CFDDFF3000D61B6 /* GoogleInterchangeUtilities.framework */,
+				5672D4F91CFDDFF3000D61B6 /* GoogleSymbolUtilities.framework */,
+				5672D4FA1CFDDFF3000D61B6 /* GoogleUtilities.framework */,
+				5672D4C91CFDD79F000D61B6 /* Firebase.h */,
+			);
+			name = Firebase;
+			sourceTree = "<group>";
+		};
 		5672D4841CFDC6D2000D61B6 = {
 			isa = PBXGroup;
 			children = (
@@ -79,13 +101,7 @@
 		5672D48F1CFDC6D3000D61B6 /* RNGoogleFirebase */ = {
 			isa = PBXGroup;
 			children = (
-				5672D5001CFDDFFC000D61B6 /* FirebaseDatabase.framework */,
-				5672D4F61CFDDFF3000D61B6 /* FirebaseAnalytics.framework */,
-				5672D4F71CFDDFF3000D61B6 /* FirebaseInstanceID.framework */,
-				5672D4F81CFDDFF3000D61B6 /* GoogleInterchangeUtilities.framework */,
-				5672D4F91CFDDFF3000D61B6 /* GoogleSymbolUtilities.framework */,
-				5672D4FA1CFDDFF3000D61B6 /* GoogleUtilities.framework */,
-				5672D4C91CFDD79F000D61B6 /* Firebase.h */,
+				561A61C31CFF1B55001F0F9D /* Firebase */,
 				5672D4901CFDC6D3000D61B6 /* RNGoogleFirebase.h */,
 				5672D4921CFDC6D3000D61B6 /* RNGoogleFirebase.m */,
 			);
