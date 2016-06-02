@@ -15,4 +15,6 @@
 
 @interface RNGoogleFirebase : NSObject <RCTBridgeModule>
 
+- (id)init;
+
 @end
