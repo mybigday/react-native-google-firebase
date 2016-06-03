@@ -8,39 +8,54 @@ let currentUser;
 
 class FIRAuth {
 	createUserWithEmail = async (email, password) => {
-		const userProps = await Firebase.createUserWithEmail(auth, email, password);
+		const userProps = await Firebase.createUserWithEmail(email, password);
 		if(userProps){
 			currentUser = new FIRUser(userProps);
 			currentAuth.currentUser = currentUser;
+			return currentUser;
 		}
-	}
+	};
+	signInWithEmail = async (email, password) => {
+		const userProps = await Firebase.createUserWithEmail(email, password);
+		if(userProps){
+			currentUser = new FIRUser(userProps);
+			currentAuth.currentUser = currentUser;
+			return currentUser;
+		}
+	};
+	signOut = async () => {
+		await Firebase.signOut();
+	};
 }
 
 FIRAuth.auth = async (app) => {
-	if(currentAuth){
-		return currentAuth;
+	if(app){
+		throw new Error("Not implement yet.");
 	}
-	else{
-		if(app){
-			throw new Error("Not implement yet.");
-		}
-		else{
-			authProps = new await Firebase.auth();
-			if(authProps){
-				currentAuth = new FIRAuth(authProps);
-			}
-		}
+	else if(!currentAuth){
+		currentAuth = new FIRAuth(await Firebase.auth());
 	}
-}
+	return currentAuth;
+};
+
+FIRAuth.currentAuth = () => currentAuth;
 
 class FIRUser {
 	constructor(props){
 		Object.assign(this, {
-
-		});
+			anonymous: false,
+			emailVerified: false,
+			refreshToken: "",
+			providerID: "",
+			uid: "",
+			displayName: "",
+			photoURL: "",
+			email: ""
+		}, props);
 	}
 }
 
 module.exports = {
-	
+	FIRAuth: FIRAuth,
+	FIRUser: FIRUser
 };
