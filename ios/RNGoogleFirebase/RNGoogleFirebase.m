@@ -140,6 +140,22 @@ RCT_EXPORT_METHOD(databaseAndReference:(RCTPromiseResolveBlock)resolve rejecter:
 			  });
 }
 
-//RCT_EXPORT_METHOD(child: resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(childFromReference: (NSString *)referenceKey path:(NSString *)path resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+    FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+    FIRDatabaseReference *target = [source child:path];
+    NSString *newKey = [referenceKey stringByAppendingString:path];
+    
+    [[appDict objectForKey:defaultAppKey] setValue:target forKey:newKey];
+    resolve(@{
+              @"appKey": defaultAppKey,
+              @"referenceKey":newKey,
+              @"path": [newKey stringByReplacingOccurrencesOfString:@"DatabaseReference:" withString:@""]
+              });
+}
+
+RCT_EXPORT_METHOD(setValueForReference: (NSString *)referenceKey value:(NSDictionary *)value){
+    FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+    [source setValue:value];
+}
 
 @end
