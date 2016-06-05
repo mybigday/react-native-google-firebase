@@ -14,7 +14,8 @@
     FIRApp *dafaultApp;
     FIRAuth *defaultAuth;
     FIRUser *currentUser;
-    FIRDatabaseReference *rootDatabaseRef;
+	FIRDatabase *defaultDatabase;
+	FIRDatabaseReference *defaultDatabaseRootReference;
     NSMutableArray *dataBaseRefList;
 }
 
@@ -39,7 +40,7 @@ RCT_EXPORT_METHOD(configure: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromis
 	NSArray *result = @[];
 	for(NSString *key in allApps.allKeys){
 		result = [result arrayByAddingObject:@{ @"key": key }];
-		[appDict setValue:[NSMutableDictionary dictionaryWithObject:[allApps objectForKey:key] forKey:key] forKey:@"FIRApp"];
+		[appDict setValue:[NSMutableDictionary dictionaryWithObject:[allApps objectForKey:key] forKey:@"FIRApp"] forKey:key];
 	}
 	resolve(result);
 	
@@ -65,7 +66,6 @@ RCT_EXPORT_METHOD(auth: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseReje
 RCT_EXPORT_METHOD(createUserWithEmail: (NSString *)email password: (NSString *)password resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
     [defaultAuth createUserWithEmail:email password:password completion:^(FIRUser *_Nullable user, NSError *_Nullable error){
         if(error != NULL){
-            NSLog(@"########## ErRoR: %@", [error description]);
             reject(@"create_user_fail", error.description, error);
         }
         if(user){
@@ -87,7 +87,6 @@ RCT_EXPORT_METHOD(createUserWithEmail: (NSString *)email password: (NSString *)p
 RCT_EXPORT_METHOD(signInWithEmail: (NSString *)email password:(NSString *)password resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
 	[defaultAuth signInWithEmail:email password:password completion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
 		if(error != NULL){
-			NSLog(@"########## ErRoR: %@", [error description]);
 			reject(@"sign_in_fail", error.description, error);
 		}
 		if(user){
@@ -116,12 +115,31 @@ RCT_EXPORT_METHOD(signOut:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRe
 	resolve(@{});
 }
 
-RCT_REMAP_METHOD(sendCurrentUserEmailVerification, resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+RCT_EXPORT_METHOD(sendCurrentUserEmailVerification:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
 	[currentUser sendEmailVerificationWithCompletion:^(NSError * _Nullable error) {
 		reject(@"sign_out_fail", error.description, error);
 		return;
 	}];
 	resolve(@{});
 }
+
+// ====== Database Group ======
+
+RCT_EXPORT_METHOD(databaseAndReference:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+	defaultDatabase = [FIRDatabase database];
+	[[appDict objectForKey:defaultAppKey] setValue:defaultDatabase forKey:@"FIRDatabase"];
+	defaultDatabaseRootReference = [defaultDatabase reference];
+	NSString *rootReferenceKey = @"DatabaseReference:/";
+	
+	[[appDict objectForKey:defaultAppKey] setValue:defaultDatabaseRootReference forKey:rootReferenceKey];
+	
+	resolve(@{
+			  @"appKey": defaultAppKey,
+			  @"referenceKey":rootReferenceKey,
+			  @"path": @"/"
+			  });
+}
+
+//RCT_EXPORT_METHOD(child: resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 @end
