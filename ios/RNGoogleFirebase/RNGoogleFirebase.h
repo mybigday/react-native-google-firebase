@@ -10,8 +10,10 @@
 @import UIKit;
 
 #import "Firebase.h"
+#import "RCTBridge.h"
 #import "RCTBridgeModule.h"
 #import "RCTEventDispatcher.h"
+#import "RCTConvert.h"
 
 @interface RNGoogleFirebase : NSObject <RCTBridgeModule>
 

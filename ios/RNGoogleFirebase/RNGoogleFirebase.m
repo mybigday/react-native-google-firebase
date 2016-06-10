@@ -8,6 +8,17 @@
 
 #import "RNGoogleFirebase.h"
 
+@implementation RCTConvert (DataEventType)
+	RCT_ENUM_CONVERTER(FIRDataEventType, (@{
+											@"FIRDataEventTypeValue" : @(FIRDataEventTypeValue),
+											@"FIRDataEventTypeChildAdded" : @(FIRDataEventTypeChildAdded),
+											@"FIRDataEventTypeChildChanged" : @(FIRDataEventTypeChildChanged),
+											@"FIRDataEventTypeChildRemoved" : @(FIRDataEventTypeChildRemoved),
+											@"FIRDataEventTypeChildMoved" : @(FIRDataEventTypeChildMoved)
+											}),
+				   FIRDataEventTypeValue, integerValue)
+@end
+
 @implementation RNGoogleFirebase{
     NSString *defaultAppKey;
     NSDictionary *appDict;
@@ -19,6 +30,8 @@
     NSMutableArray *dataBaseRefList;
 }
 
+@synthesize bridge = _bridge;
+
 - (id)init {
     self = [super init];
     if (self){
@@ -29,6 +42,17 @@
 }
 
 RCT_EXPORT_MODULE();
+
+- (NSDictionary *)constantsToExport
+{
+	return @{
+			 @"FIRDataEventTypeValue" : @(FIRDataEventTypeValue),
+			 @"FIRDataEventTypeChildAdded" : @(FIRDataEventTypeChildAdded),
+			 @"FIRDataEventTypeChildChanged" : @(FIRDataEventTypeChildChanged),
+			 @"FIRDataEventTypeChildRemoved" : @(FIRDataEventTypeChildRemoved),
+			 @"FIRDataEventTypeChildMoved" : @(FIRDataEventTypeChildMoved)
+			 };
+};
 
 RCT_EXPORT_METHOD(configure: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
 	NSDictionary *allApps = [FIRApp allApps];
@@ -156,6 +180,26 @@ RCT_EXPORT_METHOD(childFromReference: (NSString *)referenceKey path:(NSString *)
 RCT_EXPORT_METHOD(setValueForReference: (NSString *)referenceKey value:(NSDictionary *)value){
     FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
     [source setValue:value];
+}
+
+RCT_EXPORT_METHOD(observeEventTypeForReference: (NSString *)referenceKey eventType:(FIRDataEventType)eventType resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+	FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+	NSMutableDictionary *handle = [[NSMutableDictionary alloc] init];
+	FIRDatabaseHandle handleNumber = [source observeEventType:eventType withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+		NSDictionary *postDict = snapshot.value;
+		[self.bridge.eventDispatcher sendAppEventWithName:@"FIRDataEvent"
+													 body:@{
+															@"handle": [handle objectForKey:@"handle" ],
+															@"value": postDict
+															}];
+	}];
+	[handle setObject:[NSNumber numberWithInt:handleNumber] forKey:@"handle"];
+	resolve(handle);
+}
+
+RCT_EXPORT_METHOD(removeObserverWithHandleForReference: (NSString *)referenceKey handle:(FIRDatabaseHandle)handle){
+	FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+	[source removeObserverWithHandle:handle];
 }
 
 @end
