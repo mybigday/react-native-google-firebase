@@ -16,7 +16,7 @@
 											@"FIRDataEventTypeChildRemoved" : @(FIRDataEventTypeChildRemoved),
 											@"FIRDataEventTypeChildMoved" : @(FIRDataEventTypeChildMoved)
 											}),
-				   FIRDataEventTypeValue, integerValue)
+                       FIRDataEventTypeValue, integerValue)
 @end
 
 @implementation RNGoogleFirebase{
@@ -67,13 +67,6 @@ RCT_EXPORT_METHOD(configure: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromis
 		[appDict setValue:[NSMutableDictionary dictionaryWithObject:[allApps objectForKey:key] forKey:@"FIRApp"] forKey:key];
 	}
 	resolve(result);
-	
-//    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:@"Firebase configure error." forKey:NSLocalizedDescriptionKey];
-//    NSError *error = [NSError errorWithDomain:@"firebase_config_error" code:-101 userInfo:userInfo];
-//    reject(error.domain, error.localizedDescription, error);
-
-//    rootDatabaseRef = [[FIRDatabase database] reference];
-//    dataBaseRefList = [[NSMutableArray alloc] init];
 }
 
 
@@ -149,14 +142,24 @@ RCT_EXPORT_METHOD(sendCurrentUserEmailVerification:(RCTPromiseResolveBlock)resol
 
 // ====== Database Group ======
 
-RCT_EXPORT_METHOD(databaseAndReference:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
-	defaultDatabase = [FIRDatabase database];
-	[[appDict objectForKey:defaultAppKey] setValue:defaultDatabase forKey:@"FIRDatabase"];
-	defaultDatabaseRootReference = [defaultDatabase reference];
-	NSString *rootReferenceKey = @"DatabaseReference:/";
-	
-	[[appDict objectForKey:defaultAppKey] setValue:defaultDatabaseRootReference forKey:rootReferenceKey];
-	
+RCT_EXPORT_METHOD(database:(BOOL)persistenceEnabled resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+    NSString *rootReferenceKey = @"DatabaseReference:/";
+    if(!defaultDatabase){
+        NSLog(@"Init database");
+        defaultDatabase = [FIRDatabase database];
+//        defaultDatabase.persistenceEnabled = persistenceEnabled;
+        [[appDict objectForKey:defaultAppKey] setValue:defaultDatabase forKey:@"FIRDatabase"];
+        defaultDatabaseRootReference = [defaultDatabase reference];
+        
+        [[appDict objectForKey:defaultAppKey] setValue:defaultDatabaseRootReference forKey:rootReferenceKey];
+        
+        // Setting offline notification
+        FIRDatabaseReference *connectedRef = [[FIRDatabase database] referenceWithPath:@".info/connected"];
+        [connectedRef observeEventType:FIRDataEventTypeValue withBlock:^(FIRDataSnapshot *snapshot) {
+            [self.bridge.eventDispatcher sendAppEventWithName:@"FIRConnectionEvent" body:@{ @"status": [NSNumber numberWithBool:[snapshot.value boolValue]] }];
+        }];
+    }
+    
 	resolve(@{
 			  @"appKey": defaultAppKey,
 			  @"referenceKey":rootReferenceKey,
@@ -177,8 +180,23 @@ RCT_EXPORT_METHOD(childFromReference: (NSString *)referenceKey path:(NSString *)
               });
 }
 
+RCT_EXPORT_METHOD(childByAutoIdFromReference: (NSString *)referenceKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+    FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+    FIRDatabaseReference *target = [source childByAutoId];
+    NSLog(@"Target:%@ # %@", referenceKey, target.key);
+    NSString *newKey = [[referenceKey stringByAppendingString:@"/"] stringByAppendingString:target.key];
+    
+    [[appDict objectForKey:defaultAppKey] setValue:target forKey:newKey];
+    resolve(@{
+              @"appKey": defaultAppKey,
+              @"referenceKey":newKey,
+              @"path": [newKey stringByReplacingOccurrencesOfString:@"DatabaseReference:" withString:@""]
+              });
+}
+
 RCT_EXPORT_METHOD(setValueForReference: (NSString *)referenceKey value:(NSDictionary *)value){
     FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+    NSLog(@"Set value at %@", source.URL);
     [source setValue:value];
 }
 

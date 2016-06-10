@@ -16,7 +16,7 @@ class FIRAuth {
 		}
 	};
 	signInWithEmail = async (email, password) => {
-		const userProps = await Firebase.createUserWithEmail(email, password);
+		const userProps = await Firebase.signInWithEmail(email, password);
 		if(userProps){
 			currentUser = new FIRUser(userProps);
 			currentAuth.currentUser = currentUser;

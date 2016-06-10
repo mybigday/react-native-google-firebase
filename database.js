@@ -21,13 +21,13 @@ FIRDatabase.FIRDataEventType = {
 	FIRDataEventTypeValue: Firebase.FIRDataEventTypeValue
 };
 
-FIRDatabase.database = async (app) => {
+FIRDatabase.database = async (persistenceEnabled = false, app) => {
 	if(app){
 		throw new Error("Not implement yet.");
 	}
 	else if(!currentDatabase){
 		// Get default database
-		const result = await Firebase.databaseAndReference();
+		const result = await Firebase.database(persistenceEnabled);
 		let rootReference = new FIRDatabaseReference(result);
 		currentDatabase = new FIRDatabase({
 			appKey: result.defaultAppKey,
@@ -44,6 +44,10 @@ NativeAppEventEmitter.addListener("FIRDataEvent", (event) => {
 	}
 });
 
+NativeAppEventEmitter.addListener("FIRConnectionEvent", (event) => {
+	console.log(event);
+});
+
 class FIRDatabaseReference {
 	constructor(props){
 		Object.assign(this, {
@@ -55,8 +59,13 @@ class FIRDatabaseReference {
 		const result = await Firebase.childFromReference(this.referenceKey, path);
 		return new FIRDatabaseReference(result);
 	}
-	async setValue(value){
-		await Firebase.setValueForReference(this.referenceKey, value);
+	async childByAutoId(){
+		const result = await Firebase.childByAutoIdFromReference(this.referenceKey);
+		console.log(result);
+		return new FIRDatabaseReference(result);
+	}
+	setValue(value){
+		Firebase.setValueForReference(this.referenceKey, value);
 	}
 	async observeEventType(type, callback){
 		const result = await Firebase.observeEventTypeForReference(this.referenceKey, type);
