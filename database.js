@@ -67,6 +67,9 @@ class FIRDatabaseReference {
 	setValue(value){
 		Firebase.setValueForReference(this.referenceKey, value);
 	}
+	removeValue(){
+		Firebase.removeValueForReference(this.referenceKey);
+	}
 	async observeEventType(type, callback){
 		const result = await Firebase.observeEventTypeForReference(this.referenceKey, type);
 		eventHandler[result.handle] = callback;

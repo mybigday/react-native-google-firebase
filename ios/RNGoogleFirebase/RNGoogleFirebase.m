@@ -196,9 +196,14 @@ RCT_EXPORT_METHOD(childByAutoIdFromReference: (NSString *)referenceKey resolver:
 
 RCT_EXPORT_METHOD(setValueForReference: (NSString *)referenceKey value:(NSDictionary *)value){
     FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
-    NSLog(@"Set value at %@", source.URL);
     [source setValue:value];
 }
+
+RCT_EXPORT_METHOD(removeValueForReference: (NSString *)referenceKey){
+	FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
+	[source removeValue];
+}
+
 
 RCT_EXPORT_METHOD(observeEventTypeForReference: (NSString *)referenceKey eventType:(FIRDataEventType)eventType resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
 	FIRDatabaseReference *source = [[appDict objectForKey:defaultAppKey] objectForKey:referenceKey];
