@@ -1,48 +1,30 @@
 {
-  "_args": [
-    [
-      "../../../FuVision/react-native-google-firebase/",
-      "/Users/pepper/Workspace/Leedan/LeedanManagementSystem/Tablet"
-    ]
-  ],
-  "_from": "../../../FuVision/react-native-google-firebase",
-  "_id": "react-native-google-firebase@0.0.1",
-  "_inCache": true,
-  "_installable": true,
-  "_location": "/react-native-google-firebase",
-  "_phantomChildren": {},
-  "_requested": {
-    "name": null,
-    "raw": "../../../FuVision/react-native-google-firebase/",
-    "rawSpec": "../../../FuVision/react-native-google-firebase/",
-    "scope": null,
-    "spec": "/Users/pepper/Workspace/FuVision/react-native-google-firebase",
-    "type": "directory"
-  },
-  "_requiredBy": [
-    "#USER"
-  ],
-  "_resolved": "file:../../../FuVision/react-native-google-firebase",
-  "_shasum": "8e12f425dae7a7896b1aca0b0ae208188cffb113",
-  "_shrinkwrap": null,
-  "_spec": "../../../FuVision/react-native-google-firebase/",
-  "_where": "/Users/pepper/Workspace/Leedan/LeedanManagementSystem/Tablet",
-  "author": {
-    "email": "pepper.yen@gmail.com",
-    "name": "Pepper Yen"
-  },
-  "dependencies": {},
-  "description": "Firebase 3 (google version) native framework wrap.",
-  "devDependencies": {},
-  "gitHead": "5fd38fc88e806e8d686d9daf402f35a30bd35c7e",
-  "license": "MIT",
-  "main": "index.js",
   "name": "react-native-google-firebase",
-  "optionalDependencies": {},
-  "readme": "# React Native Google Firbase\n\nFirebase 3 (google version) native framework wrap.",
-  "readmeFilename": "README.md",
+  "version": "0.0.1",
+  "description": "Firebase 3 (google version) native framework wrap.",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "0.0.1"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mybigday/react-native-google-firebase.git"
+  },
+  "keywords": [
+    "react",
+    "native",
+    "firebase",
+    "google",
+    "mybigday",
+    "fuvision"
+  ],
+  "author": "Pepper Yen <pepper.yen@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mybigday/react-native-google-firebase/issues"
+  },
+  "homepage": "https://github.com/mybigday/react-native-google-firebase#readme"
 }
