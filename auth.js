@@ -23,6 +23,14 @@ class FIRAuth {
 			return currentUser;
 		}
 	};
+	signInWithCustomToken = async (token) => {
+		const userProps = await Firebase.signInWithCustomToken(token);
+		if(userProps){
+			currentUser = new FIRUser(userProps);
+			currentAuth.currentUser = currentUser;
+			return currentUser;
+		}
+	}
 	signOut = async () => {
 		await Firebase.signOut();
 	};

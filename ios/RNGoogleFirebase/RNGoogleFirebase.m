@@ -122,6 +122,27 @@ RCT_EXPORT_METHOD(signInWithEmail: (NSString *)email password:(NSString *)passwo
 	}];
 }
 
+RCT_EXPORT_METHOD(signInWithCustomToken: (NSString *)token resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+    [defaultAuth signInWithCustomToken:token completion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
+        if(error != NULL){
+            reject(@"sign_in_fail", error.description, error);
+        }
+        if(user){
+            currentUser = user;
+            resolve(@{
+                      @"anonymous": [NSNumber numberWithBool: currentUser.anonymous],
+                      @"emailVerified": [NSNumber numberWithBool: currentUser.emailVerified],
+                      @"refreshToken": currentUser.refreshToken?: @"",
+                      @"providerID": currentUser.providerID?: @"",
+                      @"uid": currentUser.uid?: @"",
+                      @"displayName": currentUser.displayName?: @"",
+                      @"photoURL": currentUser.photoURL?: @"",
+                      @"email": currentUser.email?: @"",
+                      });
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(signOut:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
 	NSError *error;
 	[defaultAuth signOut:&error];
