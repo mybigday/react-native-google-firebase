@@ -1,5 +1,5 @@
 import React from "react";
-import { NativeModules, NativeAppEventEmitter } from "react-native";
+import { NativeModules, NativeAppEventEmitter, DeviceEventEmitter } from "react-native";
 
 const Firebase = NativeModules.RNGoogleFirebase;
 
@@ -43,8 +43,19 @@ NativeAppEventEmitter.addListener("FIRDataEvent", (event) => {
 		eventHandler[event.handle](event.value);
 	}
 });
+DeviceEventEmitter.addListener("FIRDataEvent", (event) => {
+	if(eventHandler[event.handle]){
+		eventHandler[event.handle](event.value);
+	}
+});
 
 NativeAppEventEmitter.addListener("FIRConnectionEvent", (event) => {
+	console.log("Emit from NativeAppEventEmitter");
+	console.log(event);
+});
+
+DeviceEventEmitter.addListener("FIRConnectionEvent", (event) => {
+	console.log("Emit from DeviceEventEmitter");
 	console.log(event);
 });
 
