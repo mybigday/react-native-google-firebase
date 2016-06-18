@@ -1,6 +1,6 @@
 {
   "name": "react-native-google-firebase",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Firebase 3 (google version) native framework wrap.",
   "main": "index.js",
   "directories": {
