@@ -145,7 +145,6 @@ public class RNGoogleFirebase extends ReactContextBaseJavaModule {
     public void setValueForReference(String referenceKey, ReadableMap value) {
         if (this.appMap.containsKey(referenceKey)) {
             DatabaseReference source = (DatabaseReference) this.appMap.get(referenceKey);
-            Toast.makeText(getReactApplicationContext(), value.toString(), 10000).show();
             Gson gson = new Gson();
             HashMap<String, Object> map = new HashMap<String, Object>();
             map = (HashMap<String, Object>)gson.fromJson(value.toString(), map.getClass());
@@ -167,29 +166,121 @@ public class RNGoogleFirebase extends ReactContextBaseJavaModule {
             DatabaseReference source = (DatabaseReference) this.appMap.get(referenceKey);
             final int handleNumber = ++ListenerCount;
             final RNGoogleFirebase context = this;
-            ValueEventListener sourceListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Toast.makeText(getReactApplicationContext(), "Event: " + handleNumber, 3000).show();
-                    WritableMap result = Arguments.createMap();
-                    result.putInt("handle", handleNumber);
-                    result.putMap("value", (WritableMap) context.castSnapshot(dataSnapshot));
-                    context.sendEvent("FIRDataEvent", result);
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(getReactApplicationContext(), "ValueEventListener Error", 3000).show();
-                }
-            };
-//            switch(eventType){
-//                case "FIRDataEventTypeValue":
-//                    final int handleNumber = ++ListenerCount;
-//                    sourceListener =
-//                    break;
-//            }
-            source.addValueEventListener(sourceListener);
+            ValueEventListener valueEventListener = null;
+            ChildEventListener childEventListener = null;
 
+            switch(eventType){
+                case "FIRDataEventTypeValue":
+                    valueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            WritableMap result = Arguments.createMap();
+                            result.putInt("handle", handleNumber);
+                            result.putMap("value", (WritableMap) context.castSnapshot(dataSnapshot));
+                            context.sendEvent("FIRDataEvent", result);
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(getReactApplicationContext(), "ValueEventListener Error", 3000).show();
+                        }
+                    };
+                    break;
+                case "FIRDataEventTypeChildAdded":
+                    childEventListener = new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                            WritableMap result = Arguments.createMap();
+                            result.putInt("handle", handleNumber);
+                            result.putMap("value", (WritableMap) context.castSnapshot(dataSnapshot));
+                            context.sendEvent("FIRDataEvent", result);
+                        }
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {}
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(getReactApplicationContext(), "ValueEventListener Error", 3000).show();
+                        }
+                    };
+                    break;
+                case "FIRDataEventTypeChildChanged":
+                    childEventListener = new ChildEventListener() {
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+                            WritableMap result = Arguments.createMap();
+                            result.putInt("handle", handleNumber);
+                            result.putMap("value", (WritableMap) context.castSnapshot(dataSnapshot));
+                            context.sendEvent("FIRDataEvent", result);
+                        }
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {}
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(getReactApplicationContext(), "ValueEventListener Error", 3000).show();
+                        }
+                    };
+                    break;
+                case "FIRDataEventTypeChildRemoved":
+                    childEventListener = new ChildEventListener() {
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            WritableMap result = Arguments.createMap();
+                            result.putInt("handle", handleNumber);
+                            result.putMap("value", (WritableMap) context.castSnapshot(dataSnapshot));
+                            context.sendEvent("FIRDataEvent", result);
+                        }
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {}
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {}
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(getReactApplicationContext(), "ValueEventListener Error", 3000).show();
+                        }
+                    };
+                    break;
+                case "FIRDataEventTypeChildMoved":
+                    childEventListener = new ChildEventListener() {
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+                            WritableMap result = Arguments.createMap();
+                            result.putInt("handle", handleNumber);
+                            result.putMap("value", (WritableMap) context.castSnapshot(dataSnapshot));
+                            context.sendEvent("FIRDataEvent", result);
+                        }
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {}
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {}
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(getReactApplicationContext(), "ValueEventListener Error", 3000).show();
+                        }
+                    };
+                    break;
+            }
+            if(valueEventListener != null) {
+                source.addValueEventListener(valueEventListener);
+            }
+            else if(childEventListener != null){
+                source.addChildEventListener(childEventListener);
+            }
             WritableMap result = Arguments.createMap();
             result.putInt("handle", handleNumber);
             promise.resolve(result);
