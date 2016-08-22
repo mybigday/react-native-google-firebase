@@ -44,6 +44,7 @@ NativeAppEventEmitter.addListener("FIRDataEvent", (event) => {
 	}
 });
 DeviceEventEmitter.addListener("FIRDataEvent", (event) => {
+	console.log("Event:", event);
 	if(eventHandler[event.handle]){
 		eventHandler[event.handle](event.value);
 	}
@@ -68,6 +69,7 @@ class FIRDatabaseReference {
 	}
 	async child(path){
 		const result = await Firebase.childFromReference(this.referenceKey, path);
+		console.log("FIRDatabaseReference child", result);
 		return new FIRDatabaseReference(result);
 	}
 	async childByAutoId(){

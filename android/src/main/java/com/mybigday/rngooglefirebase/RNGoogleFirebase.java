@@ -7,15 +7,21 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.*;
+import com.google.firebase.storage.*;
 import com.google.gson.*;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import javax.annotation.Nullable;
 
@@ -23,6 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RNGoogleFirebase extends ReactContextBaseJavaModule {
+
+    private static final String TAG = "RNGoogleFirebase";
 
     private static final String E_DATABASE_REFERENCE_NOT_EXIST = "E_DATABASE_REFERENCE_NOT_EXIST";
     private static final String FIRDataEventTypeValue = "FIRDataEventTypeValue";
@@ -36,6 +44,8 @@ public class RNGoogleFirebase extends ReactContextBaseJavaModule {
     private String defaultAppKey = "__FIRAPP_DEFAULT";
     private HashMap<String, Object> appMap;
     private FirebaseDatabase defaultDatabase;
+    private FirebaseStorage defaultStorage;
+    private FirebaseAnalytics defaultAnalytics;
 
 
     public RNGoogleFirebase(ReactApplicationContext reactContext) {
@@ -292,44 +302,93 @@ public class RNGoogleFirebase extends ReactContextBaseJavaModule {
     // Thanks for VonD
     // http://stackoverflow.com/questions/36289315/how-can-i-pass-a-hashmap-to-a-react-native-android-callback
     private <Any> Any castSnapshot(DataSnapshot snapshot) {
-        if (snapshot.hasChildren()) {
-            WritableMap data = Arguments.createMap();
-            for (DataSnapshot child : snapshot.getChildren()) {
-                Any castedChild = castSnapshot(child);
-                switch (castedChild.getClass().getName()) {
-                    case "java.lang.Boolean":
-                        data.putBoolean(child.getKey(), (Boolean) castedChild);
-                        break;
-                    case "java.lang.Integer":
-                        data.putInt(child.getKey(), (Integer) castedChild);
-                        break;
-                    case "java.lang.Double":
-                        data.putDouble(child.getKey(), (Double) castedChild);
-                        break;
-                    case "java.lang.String":
-                        data.putString(child.getKey(), (String) castedChild);
-                        break;
-                    case "com.facebook.react.bridge.WritableNativeMap":
-                        data.putMap(child.getKey(), (WritableMap) castedChild);
-                        break;
+        if (snapshot != null) {
+            if (snapshot.hasChildren()) {
+                WritableMap data = Arguments.createMap();
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    Any castedChild = castSnapshot(child);
+                    switch (castedChild.getClass().getName()) {
+                        case "java.lang.Boolean":
+                            data.putBoolean(child.getKey(), (Boolean) castedChild);
+                            break;
+                        case "java.lang.Integer":
+                            data.putInt(child.getKey(), (Integer) castedChild);
+                            break;
+                        case "java.lang.Double":
+                            data.putDouble(child.getKey(), (Double) castedChild);
+                            break;
+                        case "java.lang.String":
+                            data.putString(child.getKey(), (String) castedChild);
+                            break;
+                        case "com.facebook.react.bridge.WritableNativeMap":
+                            data.putMap(child.getKey(), (WritableMap) castedChild);
+                            break;
+                    }
+                }
+                return (Any) data;
+            } else {
+                if(snapshot.getValue() != null) {
+                    String type = snapshot.getValue().getClass().getName();
+                    switch (type) {
+                        case "java.lang.Boolean":
+                            return (Any) ((Boolean) snapshot.getValue());
+                        case "java.lang.Long":
+                            // TODO check range errors
+                            return (Any) ((Integer) (((Long) snapshot.getValue()).intValue()));
+                        case "java.lang.Double":
+                            return (Any) ((Double) snapshot.getValue());
+                        case "java.lang.String":
+                            return (Any) ((String) snapshot.getValue());
+                        default:
+                            return (Any) null;
+                    }
+                }
+                else{
+                    return (Any) null;
                 }
             }
-            return (Any) data;
-        } else {
-            String type = snapshot.getValue().getClass().getName();
+        }
+        else{
+            return (Any) Arguments.createMap();
+        }
+    }
+
+    // Analytics
+    @ReactMethod
+    public void analytics(){
+        defaultAnalytics = FirebaseAnalytics.getInstance(getReactApplicationContext());
+    }
+    @ReactMethod
+    public void logEvent(String event, ReadableMap params){
+        Bundle result = new Bundle();
+        ReadableMapKeySetIterator iterator = params.keySetIterator();
+        while(iterator.hasNextKey()){
+            String key = iterator.nextKey();
+            ReadableType type = params.getType(key);
             switch (type) {
-                case "java.lang.Boolean":
-                    return (Any) ((Boolean) snapshot.getValue());
-                case "java.lang.Long":
-                    // TODO check range errors
-                    return (Any) ((Integer) (((Long) snapshot.getValue()).intValue()));
-                case "java.lang.Double":
-                    return (Any) ((Double) snapshot.getValue());
-                case "java.lang.String":
-                    return (Any) ((String) snapshot.getValue());
-                default:
-                    return (Any) null;
+                case String:
+                    result.putString(key, params.getString(key));
+                    break;
             }
         }
+        defaultAnalytics.logEvent(event, result);
+    }
+
+    // Storage
+    @ReactMethod
+    public void storage(Promise promise){
+        this.defaultStorage = FirebaseStorage.getInstance();
+        WritableMap result = Arguments.createMap();
+        promise.resolve(result);
+    }
+    @ReactMethod
+    public void storageReferenceForURL(String url, Promise promise){
+        StorageReference reference = this.defaultStorage.getReferenceFromUrl(url);
+
+        String rootStorageReferenceKey = "StorageReference:/";
+
+        WritableMap result = Arguments.createMap();
+        result.putString("path", url);
+        promise.resolve(result);
     }
 }
